@@ -43,15 +43,17 @@ class Client(object):
     def _get_url(self, path):
         return self.baseurl + str(path).strip()
 
-    def add_card(self, card):
+    def add_card(self, card, addressbook_path):
         expected_codes = [201]
-        path = '/card.php/addressbooks/jp/default/example.vcf'
+        path = addressbook_path + '/example.vcf'
         self._send('PUT', path, expected_codes, data=card, headers={'Content-Type': 'text/vcard', 'If-None-Match': '*'})
 
 
 if __name__ == '__main__':
-    server = raw_input('enter server url: ')
-    user = raw_input('enter username  : ')
+    server = raw_input('enter server url (without http) : ')
+    addressbook_path = raw_input('enter addressbook path : ')
+    user = raw_input('enter username: ')
+    vcards_file = raw_input('enter vcards filename: ')
     password = getpass.getpass()
 
     client = Client(server, username=user, password=password)
@@ -69,4 +71,4 @@ TEL;TYPE=FAX:412 605 0705
 URL:http://www.example.co.uk
 UID:1234-5678-9000-2
 END:VCARD"""
-    client.add_card(card)
+    client.add_card(card, addressbook_path)
