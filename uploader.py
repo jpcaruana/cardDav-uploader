@@ -5,7 +5,7 @@ from vcards import VCardParser
 
 
 class OperationFailed(Exception):
-    def __init__(self, method, path, expected_code, actual_code):
+    def __init__(self, method, path, expected_code, actual_code, response_text):
         self.method = method
         self.path = path
         self.expected_code = expected_code
@@ -15,9 +15,10 @@ class OperationFailed(Exception):
         expected_codes_str = ", ".join(str(code) for code in expected_codes)
         msg = '''\
 {self.reason}.
-  Operation     :  {method} {path}
-  Expected code :  {expected_codes_str}
-  Actual code   :  {actual_code}'''.format(**locals())
+  Operation            :  {method} {path}
+  Expected code        :  {expected_codes_str}
+  Actual code          :  {actual_code}
+  Response from server : {response_text}'''.format(**locals())
         super(OperationFailed, self).__init__(msg)
 
 
@@ -33,11 +34,9 @@ class Client(object):
 
     def _send(self, method, path, expected_code, **kwargs):
         url = self._get_url(path)
-        print url
         response = self.session.request(method, url, allow_redirects=False, **kwargs)
-        print response.text
         if response.status_code not in expected_code:
-            raise OperationFailed(method, path, expected_code, response.status_code)
+            raise OperationFailed(method, path, expected_code, response.status_code, response.text)
         return response
 
     def _get_url(self, path):
@@ -60,7 +59,7 @@ if __name__ == '__main__':
     with open(vcards_file) as f:
         cards = VCardParser().parse(f.read())
         for card in cards:
-            print "Importing " + card.title + " ..."
+            print "Importing " + card.title
             client.add_card(card, addressbook_path)
 
-    print "Import done !"
+    print "\nImport done !"
