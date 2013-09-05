@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class VcardParser(object):
+class VCardParser(object):
     def parse(self, vcards):
         cards = []
         lines = vcards.split('\n')
@@ -7,12 +7,12 @@ class VcardParser(object):
         for line in lines:
             one_card.append(line)
             if line == 'END:VCARD':
-                cards.append(Card('\n'.join(one_card)))
+                cards.append(VCard('\n'.join(one_card)))
                 one_card = []
         return cards
 
 
-class Card(object):
+class VCard(object):
     def __init__(self, content):
         self.content = content
 
