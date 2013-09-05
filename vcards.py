@@ -2,7 +2,7 @@
 class VCardParser(object):
     def parse(self, vcards):
         cards = []
-        lines = vcards.split('\n')
+        lines = vcards.replace('\n ', '').split('\n')
         one_card = []
         for line in lines:
             one_card.append(line.strip())
