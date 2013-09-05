@@ -50,7 +50,7 @@ class Client(object):
 
 if __name__ == '__main__':
     server = raw_input('enter server url (without http) : ')
-    addressbook_path = raw_input('enter addressbook path : ')
+    addressbook_path = raw_input('enter remote addressbook path : ')
     user = raw_input('enter username: ')
     password = getpass.getpass()
     client = Client(server, username=user, password=password)
