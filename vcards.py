@@ -30,12 +30,15 @@ class VCard(object):
         return '\n'.join(card)
 
     def parse_title(self, content):
+        return self._parse_field(content, 'N:') or self._parse_field(content, 'FN:')
+
+    def _parse_field(self, content, field_prefix):
         lines = content.split('\n')
         for line in lines:
-            if line.startswith("N:"):
-                line = line.replace('N:', '')
-                elements = [l.strip() for l in line.split(';') if l.strip() != ""]
-                return '.'.join(elements)
+            if line.startswith(field_prefix):
+                line = line.replace(field_prefix, '')
+                elements = [l.strip() for l in line.split(';') if l.strip() != '']
+                return '.'.join(elements) if elements else None
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) \

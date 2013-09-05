@@ -33,12 +33,26 @@ URL:http://www.example.fr
 UID:1234-5678-9000-1
 END:VCARD"""
 
+NO_NAME_JOHN_CARD = """BEGIN:VCARD
+VERSION:3.0
+FN:John;Doe
+N:;;;
+NICKNAME:john
+NOTE:Example VCard 2.
+URL:http://www.example.fr
+UID:1234-5678-9000-1
+END:VCARD"""
+
 
 class TestVcard(object):
     def test_create_a_vcard(self):
         card = VCard(TOTO_CARD)
         assert_equal(TOTO_CARD, card.content)
         assert_equal('Toto.Tutu.vcf', card.title)
+
+    def test_use_FN_when_no_N(self):
+        card = VCard(NO_NAME_JOHN_CARD)
+        assert_equal('John.Doe.vcf', card.title)
 
     def test_create_a_vcard_from_iphone(self):
         card = VCard(APPLE_CARD)
