@@ -1,7 +1,7 @@
 import getpass
 from numbers import Number
-
 import requests
+from vcards import VCardParser
 
 
 class OperationFailed(Exception):
@@ -41,34 +41,26 @@ class Client(object):
         return response
 
     def _get_url(self, path):
-        return self.baseurl + str(path).strip()
+        return self.baseurl + "/" + str(path).strip()
 
     def add_card(self, card, addressbook_path):
         expected_codes = [201]
-        path = addressbook_path + '/example.vcf'
-        self._send('PUT', path, expected_codes, data=card, headers={'Content-Type': 'text/vcard', 'If-None-Match': '*'})
+        path = addressbook_path + '/' + card.title
+        self._send('PUT', path, expected_codes, data=card.content, headers={'Content-Type': 'text/vcard', 'If-None-Match': '*'})
 
 
 if __name__ == '__main__':
     server = raw_input('enter server url (without http) : ')
     addressbook_path = raw_input('enter addressbook path : ')
     user = raw_input('enter username: ')
-    vcards_file = raw_input('enter vcards filename: ')
     password = getpass.getpass()
-
     client = Client(server, username=user, password=password)
-    card = """BEGIN:VCARD
-VERSION:3.0
-FN:Toto tutu
-N:tutu;toto
-ADR;TYPE=POSTAL:;2822 Email HQ;Suite 2821;RFCVille;PA;15213;USA
-EMAIL;TYPE=INTERNET,PREF:toto@example.com
-NICKNAME:the other one
-NOTE:Example VCard 2.
-ORG:Inc Copr
-TEL;TYPE=WORK,VOICE:412 605 0499
-TEL;TYPE=FAX:412 605 0705
-URL:http://www.example.co.uk
-UID:1234-5678-9000-2
-END:VCARD"""
-    client.add_card(card, addressbook_path)
+
+    vcards_file = raw_input('enter vcards filename: ')
+    with open(vcards_file) as f:
+        cards = VCardParser().parse(f.read())
+        for card in cards:
+            print "Importing " + card.title + " ..."
+            client.add_card(card, addressbook_path)
+
+    print "Import done !"
