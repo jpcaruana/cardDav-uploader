@@ -1,3 +1,4 @@
+import argparse
 import getpass
 from numbers import Number
 import requests
@@ -48,18 +49,24 @@ class Client(object):
         self._send('PUT', path, expected_codes, data=card.content, headers={'Content-Type': 'text/vcard', 'If-None-Match': '*'})
 
 
-if __name__ == '__main__':
-    server = raw_input('enter server url (without http) : ')
-    addressbook_path = raw_input('enter remote addressbook path : ')
-    user = raw_input('enter username: ')
-    password = getpass.getpass()
-    client = Client(server, username=user, password=password)
+def parse_command_line_args():
+    arg_parser = argparse.ArgumentParser(description='upload vcards to a carddav server')
+    arg_parser.add_argument('-s', '--server', required=True, help="server url (without http)", dest='server')
+    arg_parser.add_argument('-u', '--user', required=True, help="username", dest='user')
+    arg_parser.add_argument('-b', '--addressbook', required=True, help="remote addressbook path", dest='addressbook_path')
+    arg_parser.add_argument('-c', '--vcards', required=True, help="vcards filename", dest='vcards_file')
+    return arg_parser.parse_args()
 
-    vcards_file = raw_input('enter vcards filename: ')
-    with open(vcards_file) as f:
+
+if __name__ == '__main__':
+    args = parse_command_line_args()
+    password = getpass.getpass()
+    client = Client(args.server, username=args.user, password=password)
+
+    with open(args.vcards_file) as f:
         cards = VCardParser().parse(f.read())
         for card in cards:
             print "Importing " + card.title
-            client.add_card(card, addressbook_path)
+            client.add_card(card, args.addressbook_path)
 
     print "\nImport done !"
